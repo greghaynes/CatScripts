@@ -17,4 +17,4 @@ for line in buff_lines:
 	sshProc.wait() 
 	host_procs.append({'host': line, 'processes': json.load(sshProc.stdout)})
 
-print host_procs
+print json.dumps(host_procs).decode()

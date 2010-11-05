@@ -49,5 +49,5 @@ resp = []
 for p in processes:
 	resp.append({'pid': p.pid, 'esecs': p.esecs, 'command': p.command, 'username': p.username})
 
-print json.dumps(resp)
-
+encoder = json.JSONEncoder()
+print encoder.encode(resp).decode()
