@@ -6,11 +6,14 @@ class Process(object):
 	def __init__(self):
 		pass
 	def loadFromString(self, line):
-		args = line.split(None, 3)
+		args = line.split(None, 6)
 		self.username = args[0]
 		self.pid = args[1]
 		self.etime = args[2]
-		self.command = args[3]
+		self.pctmem = float(args[3])
+		self.pctcpu = float(args[4])
+		self.vsize = int(args[5])
+		self.command = args[5]
 		self.setEtimeFromString(self.etime)
 	def setEtimeFromString(self, string):
 		args = string.split('-')
@@ -31,7 +34,7 @@ class Process(object):
 		self.secs = int(args[ndx+1])
 		self.esecs = (self.days * (24*60*60)) + (self.hours * 60*60) + self.mins*60 + self.secs
 
-pscmd = "ps ak -etime -o user,pid,etime,cmd"
+pscmd = "ps ak -etime -o user,pid,etime,%mem,%cpu,vsz,cmd"
 psProc = Popen(pscmd, shell=True, bufsize=4096, stdout=PIPE)
 psProc.wait()
 buff = psProc.stdout.read()
@@ -47,7 +50,13 @@ for line in buff_lines:
 
 resp = []
 for p in processes:
-	resp.append({'pid': p.pid, 'esecs': p.esecs, 'command': p.command, 'username': p.username})
+	resp.append({'pid': p.pid,
+	             'esecs': p.esecs,
+	             'command': p.command,
+	             'username': p.username,
+	             'pctcpu': '%.2f' % p.pctcpu,
+	             'pctmem': '%.2f' % p.pctmem,
+	             'vsize': p.vsize})
 
 encoder = json.JSONEncoder()
 print encoder.encode(resp).decode()
