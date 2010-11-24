@@ -13,7 +13,7 @@ class Process(object):
 		self.pctmem = float(args[3])
 		self.pctcpu = float(args[4])
 		self.vsize = int(args[5])
-		self.command = args[5]
+		self.command = args[6]
 		self.setEtimeFromString(self.etime)
 	def setEtimeFromString(self, string):
 		args = string.split('-')
@@ -34,29 +34,30 @@ class Process(object):
 		self.secs = int(args[ndx+1])
 		self.esecs = (self.days * (24*60*60)) + (self.hours * 60*60) + self.mins*60 + self.secs
 
-pscmd = "ps ak -etime -o user,pid,etime,%mem,%cpu,vsz,cmd"
-psProc = Popen(pscmd, shell=True, bufsize=4096, stdout=PIPE)
-psProc.wait()
-buff = psProc.stdout.read()
-buff_lines = buff.split("\n")
-buff_lines = buff_lines[1:len(buff_lines)-2]
+def summary():
+	pscmd = "ps ak -etime -o user,pid,etime,%mem,%cpu,vsz,cmd"
+	psProc = Popen(pscmd, shell=True, bufsize=4096, stdout=PIPE)
+	psProc.wait()
+	buff = psProc.stdout.read()
+	buff_lines = buff.split("\n")
+	buff_lines = buff_lines[1:len(buff_lines)-2]
 
-processes = []
+	processes = []
 
-for line in buff_lines:
-	p = Process()
-	p.loadFromString(line)
-	processes.append(p)
+	for line in buff_lines:
+		p = Process()
+		p.loadFromString(line)
+		processes.append(p)
 
-resp = []
-for p in processes:
-	resp.append({'pid': p.pid,
-	             'esecs': p.esecs,
-	             'command': p.command,
-	             'username': p.username,
-	             'pctcpu': '%.2f' % p.pctcpu,
-	             'pctmem': '%.2f' % p.pctmem,
-	             'vsize': p.vsize})
+	resp = []
+	for p in processes:
+		resp.append({'pid': p.pid,
+			     'esecs': p.esecs,
+			     'command': p.command,
+			     'username': p.username,
+			     'pctcpu': '%.2f' % p.pctcpu,
+			     'pctmem': '%.2f' % p.pctmem,
+			     'vsize': p.vsize})
 
-encoder = json.JSONEncoder()
-print encoder.encode(resp).decode()
+	encoder = json.JSONEncoder()
+	print encoder.encode(resp).decode()

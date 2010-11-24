@@ -35,6 +35,20 @@ def strip_root_procs(processes):
 			ret.append(proc)
 	return ret
 
+def view_json_host_procs(host_procs_list):
+	processes = []
+	for host, procs in host_procs_list.items():
+		for proc in procs:
+			proc['host'] = host
+			processes.append(proc)
+
+	processes = sort_elapsed(processes)
+	processes = strip_root_procs(processes)
+	processes = processes[0:20]
+
+	for proc in processes:
+		print proc['host'], proc['pid'], proc['username'], proc['command'], proc['esecs']
+
 def main(argv):
 	procfile = None
 	sort_method = 'elapsed'
@@ -63,16 +77,6 @@ def main(argv):
 	buff = procf.read()
 	host_procs_list = decoder.decode(buff)
 	processes = []
-	for host_procs in host_procs_list:
-		for proc in host_procs['processes']:
-			proc['host'] = host_procs['host']
-			processes.append(proc)
-
-	processes = sort_elapsed(processes)
-	processes = strip_root_procs(processes)
-
-	for proc in processes:
-		print proc['host'], proc['pid'], proc['username'], proc['command'], proc['esecs']
 
 	
 
