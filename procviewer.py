@@ -78,7 +78,6 @@ def main(argv):
 	host_procs_list = decoder.decode(buff)
 	processes = []
 
-	
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
